@@ -59,8 +59,11 @@ def main():
 	module_path = kernel_path + 'extra'
 	kernel_modules = []
 	added_modules = []
-	with open('/etc/autosign.conf', 'w+') as f:
-		config = f.readlines()
+	if os.path.isfile('/etc/autosign.conf'):
+		with open('/etc/autosign.conf', 'r') as f:
+			config = f.readlines()
+	else:
+		config = []
 	kernel_modules_check = [i.replace('\n','') for i in config]
 	for root, dirs, files in os.walk(module_path):
 		for file in files:
