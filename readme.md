@@ -5,7 +5,6 @@
 - Modified by odysseus443
 
 # Prerequisite:
-  Install Nvidia drvier.
 
   Create signing keys
 -  `sudo mkdir /etc/pki/tls/mok`
