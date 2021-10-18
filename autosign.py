@@ -1,6 +1,7 @@
 # Created by Meghadeep Roy Chowdhury 4/14/2021
 # All rights reserved under GNU AGPLv3
 # details: https://www.gnu.org/licenses/agpl-3.0.en.html
+# Modified by odysseus443
 
 # Kernel sign script path
 sign_script_path = '/usr/src/kernels/{uname_release}/scripts/sign-file'
