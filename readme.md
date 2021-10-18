@@ -5,8 +5,8 @@
 - Modified by odysseus443
 
 # Installation:
-`sudo chmod +x setup.sh`
-`sudo ./setup.sh`
+- `sudo chmod +x setup.sh`
+- `sudo ./setup.sh`
 
 # Explaination
 - By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
