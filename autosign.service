@@ -1,0 +1,13 @@
+[Unit]
+Description=Auto Sign Kernel Modules
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/sbin/
+Type=oneshot
+RemainAfterExit=true
+ExecStop=/usr/bin/python /sbin/autosign.py
+
+[Install]
+WantedBy=multi-user.target
