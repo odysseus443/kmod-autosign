@@ -85,6 +85,15 @@ def main():
 				if i not in kernel_modules_check:
 					fnew.write(f'{i}\n')
 					added_modules.append(i)
+		with open ('/etc/autosign.conf', 'r') as rm_lst:
+			newlist = [i.replace('\n', '') for i in rm_lst.readlines()]
+			for i in newlist:
+				if i not in kernel_modules:
+					newlist.remove(i)
+		if newlist != []:
+			with open ('/etc/autosign.conf', 'w') as rm:
+				for i in newlist:
+					rm.write(f'{i}\n')
 		with open(f'/var/log/autosigner.log', 'a+') as f:
 			for i in added_modules:
 				f.write(f'Found added module: {i}' + datetime.datetime.now().strftime('%c') + '\n')
