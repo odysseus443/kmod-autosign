@@ -22,3 +22,6 @@
 # Explaination:
 - By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
 - The bash script will also reload the systemctl daemons and enable the service automatically.
+
+# Also:
+The logs are at `/var/log/autosigner.log`
