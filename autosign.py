@@ -59,34 +59,36 @@ def main():
 	module_path = kernel_path + 'extra'
 	kernel_modules = []
 	added_modules = []
-	with open('/etc/autosign.conf', 'a+') as f:
+	with open('/etc/autosign.conf', 'w+') as f:
 		config = f.readlines()
 	kernel_modules_check = [i.replace('\n','') for i in config]
 	for root, dirs, files in os.walk(module_path):
 		for file in files:
 			kernel_modules.append(os.path.join(root, file))
-	if kernel_modules_check != kernel_modules:
+	keys = [f.name for f in os.scandir('/etc/pki/tls/mok/') if f.is_file()]
+	if ('mok.key' in keys) and ('mok.der' in keys):
+		pass
+	else:
+		print('Keys NOT FOUND')
+		with open(f'/var/log/autosigner.log', 'a+') as f:
+			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
+		raise MOKKeyError
+	if kernel_current != kernel_updated:
+		sign(kernel_modules, kernel_updated)
+		return
+	elif kernel_modules_check != kernel_modules:
 		with open ('/etc/autosign.conf', 'a+') as fnew:
 			for i in kernel_modules:
-				if i not in kernel_modules_check and i != '':
-					fnew.write(f'\n{i}')
+				if i not in kernel_modules_check:
+					fnew.write(f'{i}\n')
 					added_modules.append(i)
 		with open(f'/var/log/autosigner.log', 'a+') as f:
 			for i in added_modules:
 				f.write(f'Found added module: {i}' + datetime.datetime.now().strftime('%c') + '\n')
-		sign(added_modules, kernel_updated)
-		return
-	elif kernel_current != kernels_present[-1]:
-		# Check if keys exist
-		keys = [f.name for f in os.scandir('/etc/pki/tls/mok/') if f.is_file()]
-		if ('mok.key' in keys) and ('mok.der' in keys):
-			sign(kernel_modules, kernel_updated)
+		if kernel_current != kernel_updated:
+			sign(added_modules, kernel_updated)
 		else:
-			print('Keys NOT FOUND')
-			with open(f'/var/log/autosigner.log', 'a+') as f:
-				f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
-			raise MOKKeyError
-		return
+			sign(added_modules, kernel_current)
 	else:
 		print('Kernel not updated, signing new kernels not required.')
 		with open(f'/var/log/autosigner.log', 'a+') as f:
