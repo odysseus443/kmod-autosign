@@ -4,7 +4,7 @@
 - details: https://www.gnu.org/licenses/agpl-3.0.en.html
 - Modified by odysseus443
 
-## Prerequisite:
+## Prerequisites:
 
 **Create the directory for soring the key**
 -  `sudo mkdir /etc/pki/tls/mok`
