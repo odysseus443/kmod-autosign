@@ -6,11 +6,11 @@
 
 ## Prerequisites:
 
-**Create the directory for soring the key**
+**Creating the directory for soring the key**
 -  `sudo mkdir /etc/pki/tls/mok`
 -  `cd /etc/pki/tls/mok`
 
-**Generate the key**
+**Generating the key**
 -  `sudo openssl req -new -x509 -newkey rsa:2048 -keyout mok.key -outform DER -out mok.der -nodes -days 36500 -subj "/CN=Descriptive name/"`
 
 **Importing the key to the motherboard**
