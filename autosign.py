@@ -68,10 +68,7 @@ def main():
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
 		return
-	if kernel_current != kernel_updated:
-		sign(kernel_modules, kernel_updated)
-		return
-	elif kernel_modules_check != kernel_modules:
+	if kernel_modules_check != kernel_modules:
 		with open ('/etc/autosign.conf', 'a+') as fnew:
 			for i in kernel_modules:
 				if i not in kernel_modules_check:
@@ -88,11 +85,17 @@ def main():
 					rm.write(f'{i}\n')
 		with open('/var/log/autosigner.log', 'a+') as f:
 			for i in added_modules:
-				f.write(f'Found added module: {i}' + datetime.datetime.now().strftime('%c') + '\n')
+				item = i.split('/')[-1]
+				f.write(f'Found added module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
 		if kernel_current != kernel_updated:
 			sign(added_modules, kernel_updated)
+			return
 		else:
 			sign(added_modules, kernel_current)
+			return
+	elif kernel_current != kernel_updated:
+		sign(kernel_modules, kernel_updated)
+		return
 	else:
 		print('Kernel not updated, signing new kernels not required.')
 		with open('/var/log/autosigner.log', 'a+') as f:
