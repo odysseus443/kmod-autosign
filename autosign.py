@@ -35,12 +35,12 @@ def sign(kernel_modules, kernel):
 		try:
 			os.system(run_script)
 			print('Signed ' + i)
-			with open(f'/var/log/autosigner.log', 'a+') as f:
+			with open('/var/log/autosigner.log', 'a+') as f:
 				f.write('Signed ' + i + '\n')
 		except Exception as e:
 			print('FAILURE: ' + i)
 			print(e)
-			with open(f'/var/log/autosigner.log', 'a+') as f:
+			with open('/var/log/autosigner.log', 'a+') as f:
 				f.write(e + '\n')
 				f.write(datetime.datetime.now().strftime('%c') + '\n')
 			raise SignError
@@ -73,7 +73,7 @@ def main():
 		pass
 	else:
 		print('Keys NOT FOUND')
-		with open(f'/var/log/autosigner.log', 'a+') as f:
+		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
 		raise MOKKeyError
 	if kernel_current != kernel_updated:
@@ -94,7 +94,7 @@ def main():
 			with open ('/etc/autosign.conf', 'w') as rm:
 				for i in newlist:
 					rm.write(f'{i}\n')
-		with open(f'/var/log/autosigner.log', 'a+') as f:
+		with open('/var/log/autosigner.log', 'a+') as f:
 			for i in added_modules:
 				f.write(f'Found added module: {i}' + datetime.datetime.now().strftime('%c') + '\n')
 		if kernel_current != kernel_updated:
@@ -103,13 +103,13 @@ def main():
 			sign(added_modules, kernel_current)
 	else:
 		print('Kernel not updated, signing new kernels not required.')
-		with open(f'/var/log/autosigner.log', 'a+') as f:
-			f.write('Kernel not updated, signing new kernels not required. ' + datetime.datetime.now().strftime('%c') + '\n')
+		with open('/var/log/autosigner.log', 'a+') as f:
+			f.write('Kernel not updated, signing new kernels is not required. ' + datetime.datetime.now().strftime('%c') + '\n')
 		return
 
 
 if __name__ == '__main__':
-	with open(f'/var/log/autosigner.log', 'a+') as f:
+	with open('/var/log/autosigner.log', 'a+') as f:
 		f.write('Service ran at ' + datetime.datetime.now().strftime('%c') + '\n')
 
 	main()
