@@ -65,7 +65,7 @@ def main():
 			kernel_modules.append(os.path.join(root, file))
 	for i in kernel_modules:
 		calc = _unixTimeNow - int(os.path.getctime(i))
-		if calc < 3600:
+		if calc < 600:
 			module_updated.append(i)
 	if len(module_updated) > 0:
 		with open('/var/log/autosigner.log', 'a+'):
