@@ -7,7 +7,7 @@ from genericpath import isfile
 import os
 import datetime
 
-# Kernel sign script path
+
 # Common kernel path
 path_common = '/lib/modules/'
 # Key location
