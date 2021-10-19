@@ -19,7 +19,9 @@
 -  `sudo mokutil --import mok.der`
   
 # Notice
-  After the script installed it might not work immediately, please use script from this link: https://www.reddit.com/r/Fedora/comments/ktxulg/comment/gitx76s/?utm_source=share&utm_medium=web2x&context=3 to sign the kernel first since there might not be a newer kernel version for the program to detect and the program will think the kernel is not updated so it will not run the signing process.
+The service should work immediately if `/etc/autosign.conf` does not exist and the script will treat all the module as first run and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
+
+The logs are at `/var/log/autosigner.log`
 
 # Installation:
 - `sudo chmod +x setup.sh`
@@ -28,6 +30,3 @@
 # Explaination:
 - By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
 - The bash script will also reload the systemctl daemons and enable the service automatically.
-
-# Also:
-The logs are at `/var/log/autosigner.log`
