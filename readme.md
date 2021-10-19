@@ -6,8 +6,6 @@
 
 # Prerequisite:
 
-## Creating signing keys:
-
 **Create the directory for soring the key**
 -  `sudo mkdir /etc/pki/tls/mok`
 -  `cd /etc/pki/tls/mok`
@@ -17,15 +15,15 @@
 
 **Importing the key to the motherboard**
 -  `sudo mokutil --import mok.der`
-  
-# Notice
-The service should be working immediately if `/etc/autosign.conf` does not exist and the script will treat all the module as first run and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
 
 The logs are at `/var/log/autosigner.log`
 
 # Installation:
 - `sudo chmod +x setup.sh`
 - `sudo ./setup.sh`
+
+# Notice
+The service should be working immediately if `/etc/autosign.conf` does not exist the script will treat all the present modules as new modules and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
 
 # Explaination:
 - By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
