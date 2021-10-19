@@ -4,7 +4,7 @@
 - details: https://www.gnu.org/licenses/agpl-3.0.en.html
 - Modified by odysseus443
 
-# Prerequisite:
+## Prerequisite:
 
 **Create the directory for soring the key**
 -  `sudo mkdir /etc/pki/tls/mok`
@@ -16,16 +16,16 @@
 **Importing the key to the motherboard**
 -  `sudo mokutil --import mok.der`
 
-# Installation:
+## Installation:
 - `sudo chmod +x setup.sh`
 - `sudo ./setup.sh`
 
-# Log:
+## Log:
 The logs are at `/var/log/autosigner.log`
 
-# Notice
+## Notice
 The service should be working immediately if `/etc/autosign.conf` does not exist the script will treat all the present modules as new modules and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
 
-# Explaination:
+## Explaination:
 - By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
 - The bash script will also reload the systemctl daemons and enable the service automatically.
