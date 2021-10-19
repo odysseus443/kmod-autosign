@@ -114,7 +114,7 @@ def main():
 		sign(kernel_modules, kernel_updated)
 		return
 	else:
-		print('Kernel not updated, signing new kernels not required.')
+		print('No updates, signing new kernels not required.')
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write('No updates, signing new kernels is not required. ' + datetime.datetime.now().strftime('%c') + '\n')
 		return
