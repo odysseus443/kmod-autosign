@@ -68,7 +68,7 @@ def main():
 		if calc < 600:
 			module_updated.append(i)
 	if len(module_updated) > 0:
-		with open('/var/log/autosigner.log', 'a+'):
+		with open('/var/log/autosigner.log', 'a+') as f:
 			for i in module_updated:
 				item = i.split('/')[-1]
 				f.write(f'Found updated module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
