@@ -6,6 +6,7 @@
 from genericpath import isfile
 import os
 import datetime
+import time
 
 
 # Common kernel path
@@ -17,7 +18,7 @@ mok_dir = '/etc/pki/tls/mok/'
 
 
 _date = datetime.datetime.now().strftime("%Y%m%d")
-
+_unixTimeNow = int(time.time())
 
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
@@ -52,6 +53,7 @@ def main():
 	module_path = kernel_path + 'extra'
 	kernel_modules = []
 	added_modules = []
+	module_updated = []
 	if os.path.isfile('/etc/autosign.conf'):
 		with open('/etc/autosign.conf', 'r') as f:
 			config = f.readlines()
@@ -61,6 +63,15 @@ def main():
 	for root, dirs, files in os.walk(module_path):
 		for file in files:
 			kernel_modules.append(os.path.join(root, file))
+	for i in kernel_modules:
+		calc = _unixTimeNow - int(os.path.getctime(i))
+		if calc > 3600:
+			module_updated.append(i)
+	if len(module_updated) > 0:
+		with open('/var/log/autosigner.log', 'a+'):
+			for i in module_updated:
+				item = i.split('/')[-1]
+				f.write(f'Found updated module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
 	if os.path.isfile(public_key) and os.path.isfile(private_key):
 		pass
 	else:
@@ -68,7 +79,7 @@ def main():
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
 		return
-	if kernel_modules_check != kernel_modules:
+	if kernel_modules_check != kernel_modules or len(module_updated) > 0:
 		with open ('/etc/autosign.conf', 'a+') as fnew:
 			for i in kernel_modules:
 				if i not in kernel_modules_check:
@@ -89,6 +100,12 @@ def main():
 				f.write(f'Found added module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
 		if kernel_current != kernel_updated:
 			sign(added_modules, kernel_updated)
+			return
+		elif len(module_updated) > 0 and kernel_current != kernel_updated:
+			sign(module_updated, kernel_updated)
+			return
+		elif len(module_updated) > 0 and kernel_current == kernel_updated:
+			sign(module_updated, kernel_current)
 			return
 		else:
 			sign(added_modules, kernel_current)
