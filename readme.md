@@ -19,7 +19,7 @@
 -  `sudo mokutil --import mok.der`
   
 # Notice
-The service should work immediately if `/etc/autosign.conf` does not exist and the script will treat all the module as first run and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
+The service should be working immediately if `/etc/autosign.conf` does not exist and the script will treat all the module as first run and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
 
 The logs are at `/var/log/autosigner.log`
 
