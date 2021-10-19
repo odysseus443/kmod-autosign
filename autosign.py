@@ -3,6 +3,7 @@
 # details: https://www.gnu.org/licenses/agpl-3.0.en.html
 # Modified by odysseus443
 
+from genericpath import isfile
 import os
 import datetime
 
@@ -12,18 +13,10 @@ path_common = '/lib/modules/'
 # Key location
 public_key = '/etc/pki/tls/mok/mok.der'
 private_key = '/etc/pki/tls/mok/mok.key'
+mok_dir = '/etc/pki/tls/mok/'
 
 
 _date = datetime.datetime.now().strftime("%Y%m%d")
-
-class MOKKeyError(Exception):
-	""" Machine Owner Key not found in the keys directory """
-	pass
-
-
-class SignError(Exception):
-	""" Error while signing the kernel modules """
-	pass
 
 
 def sign(kernel_modules, kernel):
@@ -43,7 +36,7 @@ def sign(kernel_modules, kernel):
 			with open('/var/log/autosigner.log', 'a+') as f:
 				f.write(e + '\n')
 				f.write(datetime.datetime.now().strftime('%c') + '\n')
-			raise SignError
+			return
 
 def main():
 	# Get current kernel info
@@ -68,14 +61,13 @@ def main():
 	for root, dirs, files in os.walk(module_path):
 		for file in files:
 			kernel_modules.append(os.path.join(root, file))
-	keys = [f.name for f in os.scandir('/etc/pki/tls/mok/') if f.is_file()]
-	if ('mok.key' in keys) and ('mok.der' in keys):
+	if os.path.isfile(public_key) and os.path.isfile(private_key):
 		pass
 	else:
 		print('Keys NOT FOUND')
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
-		raise MOKKeyError
+		return
 	if kernel_current != kernel_updated:
 		sign(kernel_modules, kernel_updated)
 		return
