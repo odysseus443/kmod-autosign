@@ -16,11 +16,12 @@
 **Importing the key to the motherboard**
 -  `sudo mokutil --import mok.der`
 
-The logs are at `/var/log/autosigner.log`
-
 # Installation:
 - `sudo chmod +x setup.sh`
 - `sudo ./setup.sh`
+
+# Log:
+The logs are at `/var/log/autosigner.log`
 
 # Notice
 The service should be working immediately if `/etc/autosign.conf` does not exist the script will treat all the present modules as new modules and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
