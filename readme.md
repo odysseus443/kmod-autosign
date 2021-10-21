@@ -4,6 +4,9 @@
 - details: https://www.gnu.org/licenses/agpl-3.0.en.html
 - Modified by odysseus443
 
+## Supporting Software:
+VMware, VirtualBox, Nvidia driver and any `kmod` that sits at `/lib/modules/{uname_release}/extra` and `/lib/modules/{uname_release}/misc` are automatically signed.
+
 ## Prerequisites:
 
 **Creating the directory for soring the key**
