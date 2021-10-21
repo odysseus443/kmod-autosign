@@ -7,7 +7,7 @@ Group=root
 WorkingDirectory=/sbin/
 Type=oneshot
 RemainAfterExit=true
-ExecStop=/usr/bin/python /sbin/autosign.py
+ExecStop=/usr/bin/python /sbin/autosign.pyc
 
 [Install]
 WantedBy=multi-user.target

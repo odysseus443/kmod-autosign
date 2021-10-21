@@ -11,12 +11,15 @@ import time
 
 # Common kernel path
 path_common = '/lib/modules/'
+
+
 # Key location
 public_key = '/etc/pki/tls/mok/mok.der'
 private_key = '/etc/pki/tls/mok/mok.key'
 mok_dir = '/etc/pki/tls/mok/'
 
 
+# Time
 _date = datetime.datetime.now().strftime("%Y%m%d")
 _unixTimeNow = int(time.time())
 
@@ -94,18 +97,19 @@ def main():
 			for i in module_updated:
 				item = i.split('/')[-1]
 				if i in added_modules:
+					print(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found added module: {item} ' + '\n')
 					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found added module: {item} ' + '\n')
 				else:
+					print(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found updated module: {item} ' + '\n')
 					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found updated module: {item} ' + '\n')
 		if kernel_current != kernel_updated:
 			sign(kernel_modules, kernel_updated)
-			return
 		elif len(added_modules) > 0:
 			if kernel_current != kernel_updated:
 				sign(added_modules, kernel_current)
 				return
 			else:
-				sign(module_updated, kernel_current)
+				sign(added_modules, kernel_current)
 				return
 		elif len(module_updated) > 0:
 			if kernel_current != kernel_updated:
