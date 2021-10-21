@@ -24,7 +24,7 @@ VMware, VirtualBox, Nvidia driver and any `kmod` that sits at `/lib/modules/{una
 - `sudo ./setup.sh`
 
 ## Log:
-The logs are at `/var/log/autosigner.log`
+The logs are at `/var/log/autosign.log`
 
 ## Notice
 The service should be working immediately if `/etc/autosign.conf` does not exist the script will treat all the present modules as new modules and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
