@@ -28,7 +28,7 @@ journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
 journald_handler.setLevel(level=logging.INFO)
 logger.addHandler(journald_handler)
 file_handler = logging.FileHandler('/var/log/autosign.log')
-file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', "%b %d %H:%M:%S"))
 file_handler.setLevel(level=logging.INFO)
 logger.addHandler(file_handler)
 
