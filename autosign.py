@@ -22,21 +22,20 @@ _unixTimeNow = int(time.time())
 
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
-		print('Signing ' + i)
+		print(f"[{datetime.datetime.now().strftime('%c')}] " +'Signing ' + i.split('/')[-1])
 		sign_script_path = '/usr/src/kernels/{uname_release}/scripts/sign-file'
 		sign_script_path = sign_script_path.format(uname_release=kernel)
 		run_script = sign_script_path + ' sha256 ' + private_key + ' ' + public_key + ' ' + i
 		try:
 			os.system(run_script)
-			print('Signed ' + i)
+			print(f"[{datetime.datetime.now().strftime('%c')}] " + 'Signed ' + i.split('/')[-2] + i.split('/')[-1])
 			with open('/var/log/autosigner.log', 'a+') as f:
-				f.write('Signed ' + i + '\n')
+				f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Signed ' + i.split()[-1] + '\n')
 		except Exception as e:
-			print('FAILURE: ' + i)
-			print(e)
+			print(f"[{datetime.datetime.now().strftime('%c')}] " + 'FAILURE: ' + i)
+			print(f"[{datetime.datetime.now().strftime('%c')}] " + str(e))
 			with open('/var/log/autosigner.log', 'a+') as f:
-				f.write(e + '\n')
-				f.write(datetime.datetime.now().strftime('%c') + '\n')
+				f.write(f"[{datetime.datetime.now().strftime('%c')}] " + str(e))
 			return
 
 def main():
@@ -71,17 +70,10 @@ def main():
 		calc = _unixTimeNow - int(os.path.getctime(i))
 		if calc < 600:
 			module_updated.append(i)
-	if len(module_updated) > 0:
+	if not os.path.isfile(public_key) and os.path.isfile(private_key):
+		print(f"[{datetime.datetime.now().strftime('%c')}] " + 'Keys NOT FOUND')
 		with open('/var/log/autosigner.log', 'a+') as f:
-			for i in module_updated:
-				item = i.split('/')[-1]
-				f.write(f'Found updated module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
-	if os.path.isfile(public_key) and os.path.isfile(private_key):
-		pass
-	else:
-		print('Keys NOT FOUND')
-		with open('/var/log/autosigner.log', 'a+') as f:
-			f.write('Keys NOT FOUND. ' + datetime.datetime.now().strftime('%c') + '\n')
+			f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Keys NOT FOUND. ' + '\n')
 		return
 	if kernel_modules_check != kernel_modules or len(module_updated) > 0:
 		with open ('/etc/autosign.conf', 'a+') as fnew:
@@ -99,33 +91,41 @@ def main():
 				for i in newlist:
 					rm.write(f'{i}\n')
 		with open('/var/log/autosigner.log', 'a+') as f:
-			for i in added_modules:
+			for i in module_updated:
 				item = i.split('/')[-1]
-				f.write(f'Found added module: {item} ' + datetime.datetime.now().strftime('%c') + '\n')
+				if i in added_modules:
+					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found added module: {item} ' + '\n')
+				else:
+					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found updated module: {item} ' + '\n')
 		if kernel_current != kernel_updated:
-			sign(added_modules, kernel_updated)
+			sign(kernel_modules, kernel_updated)
 			return
-		elif len(module_updated) > 0 and kernel_current != kernel_updated:
-			sign(module_updated, kernel_updated)
-			return
-		elif len(module_updated) > 0 and kernel_current == kernel_updated:
-			sign(module_updated, kernel_current)
-			return
-		else:
-			sign(added_modules, kernel_current)
-			return
+		elif len(added_modules) > 0:
+			if kernel_current != kernel_updated:
+				sign(added_modules, kernel_current)
+				return
+			else:
+				sign(module_updated, kernel_current)
+				return
+		elif len(module_updated) > 0:
+			if kernel_current != kernel_updated:
+				sign(module_updated, kernel_updated)
+				return
+			else:
+				sign(module_updated, kernel_current)
+				return
 	elif kernel_current != kernel_updated:
 		sign(kernel_modules, kernel_updated)
 		return
 	else:
-		print('No updates, signing new kernels not required.')
+		print(f"[{datetime.datetime.now().strftime('%c')}] " + 'No updates, signing new kernels not required.')
 		with open('/var/log/autosigner.log', 'a+') as f:
-			f.write('No updates, signing new kernels is not required. ' + datetime.datetime.now().strftime('%c') + '\n')
+			f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'No updates, signing new kernels is not required. ' + '\n')
 		return
 
 
 if __name__ == '__main__':
 	with open('/var/log/autosigner.log', 'a+') as f:
-		f.write('Service ran at ' + datetime.datetime.now().strftime('%c') + '\n')
+		f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Service started' + '\n')
 
 	main()
