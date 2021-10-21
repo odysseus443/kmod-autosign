@@ -7,7 +7,8 @@ from genericpath import isfile
 import os
 import datetime
 import time
-
+import logging
+from systemd.journal import JournalHandler
 
 # Common kernel path
 path_common = '/lib/modules/'
@@ -19,6 +20,12 @@ private_key = '/etc/pki/tls/mok/mok.key'
 mok_dir = '/etc/pki/tls/mok/'
 
 
+# Logging
+logger = logging.getLogger(__name__)
+journald_handler = JournalHandler()
+logger.addHandler(journald_handler)
+
+
 # Time
 _date = datetime.datetime.now().strftime("%Y%m%d")
 _unixTimeNow = int(time.time())
@@ -26,17 +33,20 @@ _unixTimeNow = int(time.time())
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
 		print(f"[{datetime.datetime.now().strftime('%c')}] " +'Signing ' + i.split('/')[-1])
+		logger.info(f"[{datetime.datetime.now().strftime('%c')}] " +'Signing ' + i.split('/')[-1])
 		sign_script_path = '/usr/src/kernels/{uname_release}/scripts/sign-file'
 		sign_script_path = sign_script_path.format(uname_release=kernel)
 		run_script = sign_script_path + ' sha256 ' + private_key + ' ' + public_key + ' ' + i
 		try:
 			os.system(run_script)
 			print(f"[{datetime.datetime.now().strftime('%c')}] " + 'Signed ' + i.split('/')[-2] + i.split('/')[-1])
+			logger.info('Signed ' + i.split('/')[-2] + i.split('/')[-1])
 			with open('/var/log/autosigner.log', 'a+') as f:
 				f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Signed ' + i.split()[-1] + '\n')
 		except Exception as e:
 			print(f"[{datetime.datetime.now().strftime('%c')}] " + 'FAILURE: ' + i)
 			print(f"[{datetime.datetime.now().strftime('%c')}] " + str(e))
+			logger.error(str(e))
 			with open('/var/log/autosigner.log', 'a+') as f:
 				f.write(f"[{datetime.datetime.now().strftime('%c')}] " + str(e))
 			return
@@ -75,6 +85,7 @@ def main():
 			module_updated.append(i)
 	if not os.path.isfile(public_key) and os.path.isfile(private_key):
 		print(f"[{datetime.datetime.now().strftime('%c')}] " + 'Keys NOT FOUND')
+		logger.error('Keys NOT FOUND')
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Keys NOT FOUND. ' + '\n')
 		return
@@ -98,9 +109,11 @@ def main():
 				item = i.split('/')[-1]
 				if i in added_modules:
 					print(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found added module: {item} ' + '\n')
+					logger.info(f'Found added module: {item}')
 					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found added module: {item} ' + '\n')
 				else:
 					print(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found updated module: {item} ' + '\n')
+					logger.info(f'Found updated module: {item}')
 					f.write(f"[{datetime.datetime.now().strftime('%c')}] " + f'Found updated module: {item} ' + '\n')
 		if kernel_current != kernel_updated:
 			sign(kernel_modules, kernel_updated)
@@ -123,13 +136,15 @@ def main():
 		return
 	else:
 		print(f"[{datetime.datetime.now().strftime('%c')}] " + 'No updates, signing new kernels not required.')
+		logger.info('No updates, signing new kernels not required.')
 		with open('/var/log/autosigner.log', 'a+') as f:
 			f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'No updates, signing new kernels is not required. ' + '\n')
 		return
 
 
 if __name__ == '__main__':
+	logger.info('Service started')
 	with open('/var/log/autosigner.log', 'a+') as f:
-		f.write(f"[{datetime.datetime.now().strftime('%c')}] " + 'Service started' + '\n')
+		f.write('Service started' + '\n')
 
 	main()
