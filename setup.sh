@@ -8,7 +8,7 @@ if [ -d "__pycache__" ]; then
   rm -rf __pycache__
 fi
 python -m py_compile autosign.py
-mv __pycache__/* /sbin/autosign.pyc
+mv -f __pycache__/* /sbin/autosign.pyc
 cp autosign.service /lib/systemd/system/
 systemctl enable autosign.service --now
 systemctl daemon-reload
