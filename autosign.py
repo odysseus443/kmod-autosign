@@ -34,8 +34,8 @@ logger.addHandler(file_handler)
 
 
 # Time
-_date = datetime.datetime.now().strftime("%Y%m%d")
 _unixTimeNow = int(time.time())
+
 
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
