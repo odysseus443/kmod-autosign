@@ -22,11 +22,14 @@ mok_dir = '/etc/pki/tls/mok/'
 
 # Logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 journald_handler = JournalHandler()
 journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
-file_handler = logging.FileHandler('/var/log/autosign.log', 'a+')
-file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+journald_handler.setLevel(level=logging.INFO)
 logger.addHandler(journald_handler)
+file_handler = logging.FileHandler('/var/log/autosign.log')
+file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+file_handler.setLevel(level=logging.INFO)
 logger.addHandler(file_handler)
 
 
@@ -36,7 +39,7 @@ _unixTimeNow = int(time.time())
 
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
-		print(f"[{datetime.datetime.now().strftime('%c')}] " +'Signing ' + i.split('/')[-1])
+		#print(f"[{datetime.datetime.now().strftime('%c')}] " +'Signing ' + i.split('/')[-1])
 		logger.info('Signing ' + i.split('/')[-1])
 		sign_script_path = '/usr/src/kernels/{uname_release}/scripts/sign-file'
 		sign_script_path = sign_script_path.format(uname_release=kernel)
