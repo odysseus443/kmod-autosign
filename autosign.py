@@ -51,7 +51,7 @@ def main():
 	kernel_updated = kernels_present[-1]
 	kernel_path = path_common + kernel_updated + '/'
 	module_path = kernel_path + 'extra'
-	module_common = kernel_path + 'misc'
+	module_misc = kernel_path + 'misc'
 	kernel_modules = []
 	added_modules = []
 	module_updated = []
@@ -64,7 +64,7 @@ def main():
 	for root, dirs, files in os.walk(module_path):
 		for file in files:
 			kernel_modules.append(os.path.join(root, file))
-	for root, dirs, files in os.walk(module_common):
+	for root, dirs, files in os.walk(module_misc):
 		for file in files:
 			kernel_modules.append(os.path.join(root, file))
 	for i in kernel_modules:
