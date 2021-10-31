@@ -4,10 +4,9 @@ Description=Auto Sign Kernel Modules
 [Service]
 User=root
 Group=root
-WorkingDirectory=/sbin/
 Type=oneshot
 RemainAfterExit=true
-ExecStop=/usr/bin/python /sbin/autosign.pyc
+ExecStop=/usr/bin/python /usr/sbin/autosign.pyc
 
 [Install]
 WantedBy=multi-user.target
