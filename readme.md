@@ -23,12 +23,13 @@ VMware, VirtualBox, Nvidia driver and any `kmod` that sits at `/lib/modules/{una
 - `sudo chmod +x setup.sh`
 - `sudo ./setup.sh`
 
+## Notice:
+If it doesn't work, please remove `/etc/autosign.conf` and reboot.
+
 ## Log:
 The logs are at `/var/log/autosign.log`
-
-## Notice
-The service should be working immediately if `/etc/autosign.conf` does not exist the script will treat all the present modules as new modules and sign the kernel recordingly, if there is a newer kernel present it will sign the newest one, otherwise it will sign the current kernel. 
+Or using `journalctl -u autosign.service`
 
 ## Explaination:
-- By running `setup.sh`, you `autosign.py` will be copied into `/sbin/` and `autosign.service` will be copied into `/lib/systemd/system/`.
+- By running `setup.sh`, your `autosign.py` will be compiled into `pyc` and copied to `/usr/sbin/` and `autosign.service` will also be copied to `/lib/systemd/system/autosign.service`.
 - The bash script will also reload the systemctl daemons and enable the service automatically.

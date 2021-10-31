@@ -5,7 +5,6 @@
 
 from genericpath import isfile
 import os
-import datetime
 import time
 import logging
 from systemd.journal import JournalHandler
@@ -40,8 +39,7 @@ _unixTimeNow = int(time.time())
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
 		logger.info('Signing ' + i.split('/')[-1])
-		sign_script_path = '/usr/src/kernels/{uname_release}/scripts/sign-file'
-		sign_script_path = sign_script_path.format(uname_release=kernel)
+		sign_script_path = f'/usr/src/kernels/{kernel}/scripts/sign-file'
 		run_script = sign_script_path + ' sha256 ' + private_key + ' ' + public_key + ' ' + i
 		try:
 			os.system(run_script)
@@ -49,6 +47,7 @@ def sign(kernel_modules, kernel):
 		except Exception as e:
 			logger.error(str(e))
 			return
+
 
 def main():
 	# Get current kernel info
@@ -59,9 +58,9 @@ def main():
 	kernels_present.sort()
 	# Only need to proceed if there's been a kernel update
 	kernel_updated = kernels_present[-1]
-	kernel_path = path_common + kernel_updated + '/'
-	module_path = kernel_path + 'extra'
-	module_misc = kernel_path + 'misc'
+	kernel_path = [path_common + f + '/' for f in kernels_present]
+	module_path = [f + 'extra/' for f in kernel_path]
+	module_misc = [f + 'misc/' for f in kernel_path]
 	kernel_modules = []
 	added_modules = []
 	module_updated = []
@@ -71,12 +70,14 @@ def main():
 	else:
 		config = []
 	kernel_modules_check = [i.replace('\n','') for i in config]
-	for root, dirs, files in os.walk(module_path):
-		for file in files:
-			kernel_modules.append(os.path.join(root, file))
-	for root, dirs, files in os.walk(module_misc):
-		for file in files:
-			kernel_modules.append(os.path.join(root, file))
+	for i in module_path:
+		for root, dirs, files in os.walk(i):
+			for file in files:
+				kernel_modules.append(os.path.join(root, file))
+	for i in module_misc:
+		for root, dirs, files in os.walk(i):
+			for file in files:
+				kernel_modules.append(os.path.join(root, file))
 	for i in kernel_modules:
 		calc = _unixTimeNow - int(os.path.getctime(i))
 		if calc < 600:
@@ -84,45 +85,40 @@ def main():
 	if not os.path.isfile(public_key) and os.path.isfile(private_key):
 		logger.error('Keys NOT FOUND')
 		return
-	if kernel_modules_check != kernel_modules or len(module_updated) > 0:
-		with open ('/etc/autosign.conf', 'a+') as fnew:
+	if kernel_modules_check != kernel_modules or module_updated != []:
+		with open ('/etc/autosign.conf', 'w') as fnew:
 			for i in kernel_modules:
+				fnew.write(f'{i}\n')
 				if i not in kernel_modules_check:
-					fnew.write(f'{i}\n')
 					added_modules.append(i)
-		with open ('/etc/autosign.conf', 'r') as rm_lst:
-			newlist = [i.replace('\n', '') for i in rm_lst.readlines()]
-			for i in newlist:
-				if i not in kernel_modules:
-					newlist.remove(i)
-		if newlist != []:
-			with open ('/etc/autosign.conf', 'w') as rm:
-				for i in newlist:
-					rm.write(f'{i}\n')
-		for i in module_updated:
-			item = i.split('/')[-1]
-			if i in added_modules:
-				logger.info(f'Found added module: {item}')
-			else:
-				logger.info(f'Found updated module: {item}')
+					module_updated.append(i)
+		if module_updated != [] or added_modules != []:
+			for i in module_updated:
+				item = i.split('/')[3] + ' ' + i.split('/')[-1]
+				if i not in added_modules:
+					logger.info(f'Found updated module: {item}')
+			for i in added_modules:
+				item = i.split('/')[3] + ' ' + i.split('/')[-1]
+				if i not in module_updated:
+					logger.info(f'Found added module: {item}')
+		else:
+			logger.info('No updates, signing new kernels not required.')
+			return
 		if kernel_current != kernel_updated:
-			sign(kernel_modules, kernel_updated)
+			sign([i for i in kernel_modules if kernel_updated in i], kernel_updated)
 		elif len(added_modules) > 0:
-			if kernel_current != kernel_updated:
-				sign(added_modules, kernel_current)
-				return
-			else:
-				sign(added_modules, kernel_current)
-				return
+			sign([i for i in added_modules if kernel_updated in i], kernel_updated)
+			sign([i for i in added_modules if kernel_current in i], kernel_current)
+			return
 		elif len(module_updated) > 0:
 			if kernel_current != kernel_updated:
-				sign(module_updated, kernel_updated)
+				sign([i for i in module_updated if kernel_updated in i], kernel_updated)
 				return
 			else:
-				sign(module_updated, kernel_current)
+				sign([i for i in module_updated if kernel_current in i], kernel_current)
 				return
 	elif kernel_current != kernel_updated:
-		sign(kernel_modules, kernel_updated)
+		sign([i for i in kernel_modules if kernel_updated in i], kernel_updated)
 		return
 	else:
 		logger.info('No updates, signing new kernels not required.')
