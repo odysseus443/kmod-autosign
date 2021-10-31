@@ -38,12 +38,12 @@ _unixTimeNow = int(time.time())
 
 def sign(kernel_modules, kernel):
 	for i in kernel_modules:
-		logger.info('Signing ' + i.split('/')[-1])
+		logger.info('Signing ' + i.split('/')[3] + ' ' + i.split('/')[-1])
 		sign_script_path = f'/usr/src/kernels/{kernel}/scripts/sign-file'
 		run_script = sign_script_path + ' sha256 ' + private_key + ' ' + public_key + ' ' + i
 		try:
 			os.system(run_script)
-			logger.info('Signed ' + i.split('/')[-2] + i.split('/')[-1])
+			logger.info('Signed ' + i.split('/')[3] + ' ' + i.split('/')[-1])
 		except Exception as e:
 			logger.error(str(e))
 			return
